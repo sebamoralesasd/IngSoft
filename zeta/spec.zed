@@ -1,0 +1,131 @@
+\documentclass{article}
+\usepackage{czt}
+
+\begin{document}
+\begin{zed}
+  [NOMBRE, CONTRA, CONTRASEGURA, GRUPO] \\
+  MENSAJE ::= ok | noExisteUser | userNoLogueado \\
+  | contraInvalida
+\end{zed}
+
+\begin{schema}{AdminDeUsers}
+  usuario : NOMBRE \pfun CONTRASEGURA \\
+  gruposSistema : \power GRUPO \\
+  grupo : NOMBRE \pfun GRUPO \\
+  logueado : \power NOMBRE \\
+  contraCifrada : CONTRA \pfun CONTRASEGURA
+\end{schema}
+
+\begin{axdef}
+  root : NOMBRE
+\end{axdef}
+
+\begin{schema}{ADUInicio}
+  AdminDeUsers
+\where
+  root \in \dom usuario \\
+  gruposSistema \neq \emptyset \\
+  grupo = \emptyset \\
+  logueado = \emptyset
+\end{schema}
+
+\begin{schema}{CrearUserOk}
+  \Delta AdminDeUsers \\
+  n? : NOMBRE \\
+  c? : CONTRA \\
+  rep! : MENSAJE
+\where
+  n? \notin \dom usuario \\
+  c? \in \dom contraCifrada \\
+  usuario' = usuario \cup \{ n? \mapsto contraCifrada(c?) \} \\
+  rep! = ok
+\end{schema}
+
+\begin{schema}{EliminarUser}
+  \Delta AdminDeUsers \\
+  n? : NOMBRE \\ 
+  rep! : MENSAJE
+\where
+  n? \in \dom usuario \\
+  root \in logueado \\
+  logueado' = logueado \setminus \{ n? \} \\
+  usuario' = \{ n? \} \ndres usuario \\
+  rep! = ok
+\end{schema}
+
+\begin{schema}{Login}
+  \Delta AdminDeUsers \\
+  n? : NOMBRE \\
+  c? : CONTRA \\
+  rep! : MENSAJE
+\where
+  n? \in \dom usuario \\
+  c? \in \dom contraCifrada \\
+  n? \notin logueado \\
+  usuario(n?) = contraCifrada(c?) \\
+  logueado' = \{ n? \} \cup logueado \\
+  rep! = ok
+\end{schema}
+
+\begin{schema}{LogoutOk}
+  \Delta AdminDeUsers \\
+  n? : NOMBRE \\
+  rep! : MENSAJE
+\where
+  n? \in \dom usuario \\
+  n? \in logueado \\
+  logueado' = logueado \setminus \{ n? \} \\
+  rep! = ok
+\end{schema}
+
+\begin{schema}{NoExisteUser}
+  \Xi AdminDeUsers \\
+  n? : NOMBRE \\
+  rep! : MENSAJE
+\where
+  n? \notin \dom usuario \\
+  rep! = noExisteUser
+\end{schema}
+
+\begin{schema}{UserNoLogueado}
+  \Xi AdminDeUsers \\
+  n? : NOMBRE \\
+  rep! : MENSAJE
+\where
+  n? \in \dom usuario \\
+  n? \notin logueado \\
+  rep! = userNoLogueado
+\end{schema}
+
+\begin{schema}{ContraInvalida}
+  \Xi AdminDeUsers \\
+  n? : NOMBRE \\
+  c? : CONTRA \\
+  rep! : MENSAJE
+\where
+  n? \in \dom usuario \\
+  n? \in logueado \\
+  c? \in \dom contraCifrada \\
+  usuario(n?) \neq contraCifrada(c?) \\
+  rep! = contraInvalida
+\end{schema}
+
+\begin{zed}
+Logout == LogoutOk \lor NoExisteUser \lor UserNoLogueado \\
+  \lor ContraInvalida
+\end{zed}
+
+\begin{schema}{AgregarAGrupo}
+  \Delta AdminDeUsers \\
+  n? : NOMBRE \\
+  g? : GRUPO \\ 
+  rep! : MENSAJE
+\where
+  root \in logueado \\
+  n? \in \dom usuario \\
+  g? \in gruposSistema \\
+  grupo' = grupo \oplus \{ n? \mapsto g? \} \\
+  rep! = ok
+\end{schema}
+
+\end{document}

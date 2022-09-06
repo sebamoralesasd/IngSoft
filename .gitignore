@@ -2,7 +2,16 @@ CSP/
 Misc/
 Statecharts/
 Z/
-zeta/
 .metadata/
 czt.sty
 */**/*.toolbox
+*.aux
+*.patch
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+*.synctex.gz
+*.pdf
+*.tex
+.project

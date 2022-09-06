@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage{czt}
+
+\begin{document}
+\begin{zed}
+  [NOMBRE, CADENA, FECHA, USUARIO] \\
+  MENSAJE ::= ok
+\end{zed}
+
+\begin{schema}{Documento}
+  nombre : NOMBRE \\
+  cuerpo : \seq CADENA \\
+  fecha : FECHA
+\end{schema}
+
+\begin{schema}{ModificarLinea}
+\Delta Documento \\
+  i? : \nat \\
+  ca? : CADENA \\
+  f? : FECHA
+  \where
+  cuerpo' = cuerpo \oplus \{ i? \mapsto ca? \} \\
+  fecha' = f? \\
+  nombre' = nombre
+\end{schema}
+
+\begin{schema}{BuscarLinea}
+Documento \\
+ca? : CADENA \\
+rep! : \power \nat
+  \where
+  rep! = \dom (cuerpo \rres \{ ca? \})
+\end{schema}
+
+\begin{schema}{Sistema}
+usuarios : \power USUARIO \\
+base_doc : \power Documento
+\end{schema}
+
+\begin{schema}{ModificarDocumento}
+  \Delta Sistema \\
+  ModificarLinea \\
+  u? : USUARIO \\
+  n? : NOMBRE
+  \where
+  u? \in usuarios \\
+  base_doc' = base_doc \setminus \\ 
+  \{ d : base_doc | d = \theta Documento \land d.nombre = n? @ d \} \ \cup \\
+  \{ d : base_doc | d = \theta Documento \land d.nombre = n? @ \theta Documento\ ' \}
+  
+\end{schema}
+
+\begin{schema}{Buscar}
+  Sistema \\
+  u? : USUARIO \\
+  rrep! : Documento \pfun \power \nat
+  \where
+  u? \in usuarios \\
+  rrep! = \{ d : base_doc; BuscarLinea | d = \theta Documento @ d \mapsto rep! \}
+\end{schema}
+
+\end{document}
