@@ -2,6 +2,7 @@ CSP/
 Misc/
 Statecharts/
 Z/
+TLA/Examples
 .metadata/
 czt.sty
 */**/*.toolbox
